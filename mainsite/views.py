@@ -1,4 +1,4 @@
-import json, os, urllib, httplib
+import json, os, urllib, httplib, urllib2
 from django import http
 from django.shortcuts import render_to_response
 
@@ -8,9 +8,11 @@ class AuthConfig:
 	exchange_request_url = r'accounts.google.com/o/oauth2/token'
 	client_secret_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'client_secret.json')
 
-class YoutubeAPIConfig:
+class Youtube_API:
 	base_url = r'https://www.googleapis.com/youtube/v3'
-	subscriptions_url = '%s/subscriptions' % base_url
+	subscriptions_url = '%s/subscriptions/part=snippet&mine=true' % base_url
+	channel_url = '%s/channels/?part=snippet&mine=true' % base_url
+
 
 def welcome(request):
 	passed_dict = {}
@@ -49,10 +51,15 @@ def exchange_auth(request):
 			  'grant_type' : 'authorization_code'
 			  }
 
-	connection = httplib.HTTPSConnection(AuthConfig.exchange_request_url)
-	connection.request('POST', '', urllib.urlencode(params))
-	response = connection.getresponse()
-	a = response.status
-	b = response.read()
-	c = d
+	auth_api_connection = httplib.HTTPSConnection(AuthConfig.exchange_request_url)
+	auth_api_connection.request('POST', '', urllib.urlencode(params))
+	auth_api_response = auth_api_connection.getresponse()
+
+	if auth_api_response.status == 200:
+		auth_api_response = json.loads(auth_api_response.read())
+		user_channel_query_url = '%s&access_token=%s' % (Youtube_API.channel_url, auth_api_response['access_token'])
+
+		user_channel_response = urllib.urlopen(user_channel_query_url)
+		user_channel_response = json.loads(user_channel_response.read())
+		
 	return render_to_response('home.html')
