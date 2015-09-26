@@ -95,6 +95,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'google.appengine.ext.ndb.django_middleware.NdbDjangoMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -119,6 +120,8 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'mainsite',
 )
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to
