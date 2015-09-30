@@ -27,10 +27,11 @@ def home(request):
 	google_id = request.session.get('id')
 
 	query_user_info = user_related.get_user_info(email=email, google_id=google_id)
-	youtube.get_subscriptions(query_user_info)
-	b = c
+	all_subscriptions = youtube.get_subscriptions(query_user_info)
+
 	passed_dict['email'] = email
 	passed_dict['google_id'] = google_id
+	passed_dict['all_subscriptions'] = all_subscriptions
 	return render_to_response('home.html', passed_dict)
 
 

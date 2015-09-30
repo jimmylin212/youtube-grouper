@@ -2,6 +2,9 @@
   <head>
   </head>
   <body>
-  	Hello, {{email}}
+  	Hello, {{email}}, 
+  	{% for subscription in all_subscriptions %}
+  		{{ subscription }}<br/>
+  	{% endfor %}
   </body>
 <html>

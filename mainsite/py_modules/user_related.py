@@ -14,7 +14,7 @@ class UserRelated:
 		with open(UserRelated.client_secret_file, 'rb') as read_client_secret_file:
 			client_secret = json.load(read_client_secret_file)
 
-		auth_url = '%s?scope=%s&client_id=%s&redirect_uri=%s&response_type=code' % (
+		auth_url = '%s?scope=%s&client_id=%s&redirect_uri=%s&response_type=code&access_type=offline&approval_prompt=force' % (
 			UserRelated.auth_url_base, ' '.join(UserRelated.scopes),
 			client_secret['web']['client_id'], client_secret['web']['redirect_uris'][0])
 
@@ -25,7 +25,9 @@ class UserRelated:
 		with open(UserRelated.client_secret_file, 'rb') as read_client_secret_file:
 			client_secret = json.load(read_client_secret_file)
 
-		parameters = urllib.urlencode({'code' : code, 'grant_type' : 'authorization_code',
+		parameters = urllib.urlencode({
+			'code' : code, 
+			'grant_type' : 'authorization_code',
 			'client_id' : client_secret['web']['client_id'], 
 			'client_secret' : client_secret['web']['client_secret'],
 			'redirect_uri' : client_secret['web']['redirect_uris'][0]})
@@ -54,15 +56,44 @@ class UserRelated:
 
 		return email, google_id
 
+	def refresh_access_token(self, email, google_id, refresh_token):
+		## Read client secret file	
+		with open(UserRelated.client_secret_file, 'rb') as read_client_secret_file:
+			client_secret = json.load(read_client_secret_file)
+
+		parameters = urllib.urlencode({
+			'grant_type' : 'refresh_token', 
+			'refresh_token' : refresh_token,
+			'client_id' : client_secret['web']['client_id'],
+			'client_secret' : client_secret['web']['client_secret']
+			})
+
+		connection = httplib.HTTPSConnection(UserRelated.auth_token_url)
+		connection.request("POST", "", parameters)
+		response = connection.getresponse()
+		status = response.status
+		tokens = json.loads(response.read())
+		
+		## Update the access token
+		self.update_auth_data(email, google_id, tokens)
+
 	def store_auth_data(self, tokens, user_info):
 		db_utility = DBUtility()
 
 		query_result = db_utility.search_userinfo(email=user_info['email'], google_id=user_info['id'])
 		if query_result == None:
 			user_info_key = db_utility.store_userinfo(
-				email=user_info['email'], name=user_info['name'], 
-		 		picture=user_info['picture'], google_id=user_info['id'], access_token=tokens, 
-		 		register_datetime=datetime.datetime.now(), last_login_datetime=datetime.datetime.now(), 
+				email=user_info['email'], 
+				name=user_info['name'], 
+		 		picture=user_info['picture'], 
+		 		google_id=user_info['id'], 
+		 		access_token=tokens['access_token'],
+		 		expires_in=tokens['expires_in'],
+		 		token_type=tokens['token_type'],
+		 		refresh_token=tokens['refresh_token'],
+		 		id_token=tokens['id_token'],
+		 		register_datetime=datetime.datetime.now(), 
+		 		last_login_datetime=datetime.datetime.now(), 
 		 		access_token_gen_datetime=datetime.datetime.now())
 			
 			## Query again to get user data
@@ -74,13 +105,25 @@ class UserRelated:
 
 		return query_result
 
+	def update_auth_data(self, email, google_id, tokens):
+		db_utility = DBUtility()
+
+		query_result = db_utility.search_userinfo(email=email, google_id=google_id)
+
+		query_result.access_token = tokens['access_token']
+		query_result.expires_in = tokens['expires_in']
+		query_result.access_token_gen_datetime = datetime.datetime.now()
+		db_utility.update_userinfo(query_result)
+
+
 	def get_user_info(self, email, google_id):
 		db_utility = DBUtility()
 		query_result = db_utility.search_userinfo(email=email, google_id=google_id)
 
-		if (datetime.datetime.now() - query_result.access_token_gen_datetime).total_seconds() > 3600:
+		if (datetime.datetime.now() - query_result.access_token_gen_datetime).total_seconds() > query_result.expires_in:
 			## Access toekn is expired, refresh it.
-			b = c
-			pass
+			self.refresh_access_token(email=email, google_id=google_id, refresh_token=query_result.refresh_token)
+			query_result = db_utility.search_userinfo(email=email, google_id=google_id)
 
 		return query_result
+

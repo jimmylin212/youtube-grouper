@@ -14,7 +14,7 @@ class Youtube:
 
 	def get_subscriptions(self, user_info):
 		all_subscriptions = []
-		access_token = user_info.access_token['access_token']
+		access_token = user_info.access_token
 
 		query_url = Youtube.subscriptions_url
 		while True:
@@ -25,4 +25,4 @@ class Youtube:
 			else:
 				break
 				
-		return True
+		return all_subscriptions
