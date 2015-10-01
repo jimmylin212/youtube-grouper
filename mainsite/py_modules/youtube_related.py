@@ -14,15 +14,23 @@ class Youtube:
 
 	def get_subscriptions(self, user_info):
 		all_subscriptions = []
+		query_subscriptions = []
 		access_token = user_info.access_token
 
 		query_url = Youtube.subscriptions_url
 		while True:
 			response = self.api_querying(query_url, access_token)
-			all_subscriptions.extend(response['items'])
+			query_subscriptions.extend(response['items'])
 			if 'nextPageToken' in response:
 				query_url = '%s&pageToken=%s' % (Youtube.subscriptions_url, response['nextPageToken'])
 			else:
 				break
-				
+
+		for subscription in query_subscriptions:
+			temp_dict = {}
+			temp_dict['thumbnail'] = subscription['snippet']['thumbnails']['default']['url']
+			temp_dict['title'] = subscription['snippet']['title']
+			temp_dict['channelid'] = subscription['snippet']['resourceId']['channelId']
+			all_subscriptions.append(temp_dict)
+
 		return all_subscriptions

@@ -14,3 +14,8 @@ class UserInfo(ndb.Model):
 	register_datetime = ndb.DateTimeProperty()
 	last_login_datetime = ndb.DateTimeProperty()
 	access_token_gen_datetime = ndb.DateTimeProperty()
+
+class UserSubscription(ndb.Model):
+	email = ndb.StringProperty()
+	google_id = ndb.StringProperty()
+	

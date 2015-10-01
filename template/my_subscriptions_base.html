@@ -1,0 +1,43 @@
+<html>
+  <head>
+    {% block share_head %}{% endblock %}
+    <script type="text/javascript" src="/static/js/image-picker.js"></script>
+    <script type="text/javascript" src="/static/js/image-picker.min.js"></script>
+    <link type="text/css" href="/static/css/image-picker.css" rel="stylesheet">
+    <script>
+      $(document).ready(function() {
+        $("#image_picker").imagepicker({show_label:true});
+      });
+    </script>
+    <style type="text/css"> .raw {margin-top: 20px;}</style>
+  </head>
+  <body>
+    {% block share_menu %}{% endblock %}
+
+  	<div class="container-fluid" style="padding-top:50px;">
+      <form method="post">{% csrf_token %}
+        <div class="raw">
+          <div class="col-md-5">
+            <div class="input-group">
+              <span class="input-group-btn">
+                <button class="btn btn-default" type="button">Add</button>
+              </span>
+              <input type="text" class="form-control" placeholder="Group name...">
+            </div>
+          </div>
+        </div>
+        <div class="raw">
+          <div class="col-md-12">
+            <select multiple="multiple" class="image-picker show-label show-html" id="image_picker" name='select_subscription'>
+            {% for subscription in all_subscriptions|dictsort:"title" %}
+              <option 
+              data-img-label="{{subscription.title}}"
+              data-img-src="{{subscription.thumbnail}}" value="{{subscription.channelid}}"></option>
+            {% endfor %}
+            </select>
+          </div>
+        </div>
+      </form>
+  	</div>
+  </body>
+<html>

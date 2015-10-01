@@ -49,14 +49,12 @@ class UserRelated:
 
 		if query_user_info != None:
 			email = query_user_info.email
-			google_id = query_user_info.google_id
 		else:
 			email = user_info_response['email']
-			google_id = user_info_response['id']
 
-		return email, google_id
+		return email
 
-	def refresh_access_token(self, email, google_id, refresh_token):
+	def refresh_access_token(self, email, refresh_token):
 		## Read client secret file	
 		with open(UserRelated.client_secret_file, 'rb') as read_client_secret_file:
 			client_secret = json.load(read_client_secret_file)
@@ -75,12 +73,12 @@ class UserRelated:
 		tokens = json.loads(response.read())
 		
 		## Update the access token
-		self.update_auth_data(email, google_id, tokens)
+		self.update_auth_data(email, tokens)
 
 	def store_auth_data(self, tokens, user_info):
 		db_utility = DBUtility()
 
-		query_result = db_utility.search_userinfo(email=user_info['email'], google_id=user_info['id'])
+		query_result = db_utility.search_userinfo(email=user_info['email'])
 		if query_result == None:
 			user_info_key = db_utility.store_userinfo(
 				email=user_info['email'], 
@@ -97,7 +95,7 @@ class UserRelated:
 		 		access_token_gen_datetime=datetime.datetime.now())
 			
 			## Query again to get user data
-			query_result = db_utility.search_userinfo(email=user_info['email'], google_id=user_info['id'])
+			query_result = db_utility.search_userinfo(email=user_info['email'])
 
 		else:
 			query_result.last_loging_datetime = datetime.datetime.now()
@@ -105,10 +103,10 @@ class UserRelated:
 
 		return query_result
 
-	def update_auth_data(self, email, google_id, tokens):
+	def update_auth_data(self, email, tokens):
 		db_utility = DBUtility()
 
-		query_result = db_utility.search_userinfo(email=email, google_id=google_id)
+		query_result = db_utility.search_userinfo(email=email)
 
 		query_result.access_token = tokens['access_token']
 		query_result.expires_in = tokens['expires_in']
@@ -116,14 +114,14 @@ class UserRelated:
 		db_utility.update_userinfo(query_result)
 
 
-	def get_user_info(self, email, google_id):
+	def get_user_info(self, email):
 		db_utility = DBUtility()
-		query_result = db_utility.search_userinfo(email=email, google_id=google_id)
+		query_result = db_utility.search_userinfo(email=email)
 
 		if (datetime.datetime.now() - query_result.access_token_gen_datetime).total_seconds() > query_result.expires_in:
 			## Access toekn is expired, refresh it.
-			self.refresh_access_token(email=email, google_id=google_id, refresh_token=query_result.refresh_token)
-			query_result = db_utility.search_userinfo(email=email, google_id=google_id)
+			self.refresh_access_token(email=email, refresh_token=query_result.refresh_token)
+			query_result = db_utility.search_userinfo(email=email)
 
 		return query_result
 

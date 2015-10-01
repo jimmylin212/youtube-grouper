@@ -12,13 +12,12 @@ def authentication(request):
 		auth_url = user_related.get_auth_url()
 		return redirect(auth_url)
 	else:
-		email, google_id = user_related.authentication(code=request.GET.get('code'))
+		email = user_related.authentication(code=request.GET.get('code'))
 		request.session['email'] = email
-		request.session['google_id'] = google_id
 
 		return redirect('/home')
 
-def home(request):
+def my_subscriptions(request):
 	passed_dict = {}
 	youtube = Youtube()
 	user_related = UserRelated()
@@ -26,13 +25,13 @@ def home(request):
 	email = request.session.get('email')
 	google_id = request.session.get('id')
 
-	query_user_info = user_related.get_user_info(email=email, google_id=google_id)
+	query_user_info = user_related.get_user_info(email=email)
 	all_subscriptions = youtube.get_subscriptions(query_user_info)
 
 	passed_dict['email'] = email
-	passed_dict['google_id'] = google_id
 	passed_dict['all_subscriptions'] = all_subscriptions
-	return render_to_response('home.html', passed_dict)
+
+	return render_to_response('my_subscriptions.html', passed_dict)
 
 
 def login(request):
