@@ -17,5 +17,11 @@ class UserInfo(ndb.Model):
 
 class UserSubscription(ndb.Model):
 	email = ndb.StringProperty()
-	google_id = ndb.StringProperty()
+	channels = ndb.JsonProperty()
+	all_groups = ndb.JsonProperty()
+
+class Channels(ndb.Model):
+	channel_name = ndb.StringProperty()
+	channel_id = ndb.StringProperty()
+
 	

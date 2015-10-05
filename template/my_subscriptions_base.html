@@ -6,38 +6,43 @@
     <link type="text/css" href="/static/css/image-picker.css" rel="stylesheet">
     <script>
       $(document).ready(function() {
-        $("#image_picker").imagepicker({show_label:true});
+        $("select").imagepicker({show_label:true});
       });
     </script>
-    <style type="text/css"> .raw {margin-top: 20px;}</style>
+    <style type="text/css"> .topbuffer { margin-top:20px; } </style>
   </head>
   <body>
     {% block share_menu %}{% endblock %}
-
-  	<div class="container-fluid" style="padding-top:50px;">
-      <form method="post">{% csrf_token %}
+    <form method="post" action="">{% csrf_token %}
+  	  <div class="container-fluid" style="padding-top:70px;">
         <div class="raw">
           <div class="col-md-5">
             <div class="input-group">
               <span class="input-group-btn">
-                <button class="btn btn-default" type="button">Add</button>
+                <button class="btn btn-default" type="submit" value="AddGroups" name="form_action">Add into Group</button>
               </span>
-              <input type="text" class="form-control" placeholder="Group name...">
+              <input type="text" class="form-control" placeholder="Group name..." name="group_name">
             </div>
           </div>
         </div>
+      </div>
+      <hr>
+      <div class="container-fluid">
         <div class="raw">
           <div class="col-md-12">
-            <select multiple="multiple" class="image-picker show-label show-html" id="image_picker" name='select_subscription'>
-            {% for subscription in all_subscriptions|dictsort:"title" %}
-              <option 
-              data-img-label="{{subscription.title}}"
-              data-img-src="{{subscription.thumbnail}}" value="{{subscription.channelid}}"></option>
-            {% endfor %}
+          {% for group_name, channels in grouped_channels.items %}
+            <h3>{{group_name}}</h3>
+            <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'>             
+              {% for channel in channels|dictsort:"channel_title" %}
+                <option data-img-label="{{channel.channel_title}}"
+                  data-img-src="{{channel.channel_thumbnail}}" value="{{channel.channel_id}}"></option>
+              {% endfor %}
             </select>
+            <hr>
+          {% endfor %}
           </div>
         </div>
-      </form>
-  	</div>
+  	  </div>
+    </form>
   </body>
 <html>
