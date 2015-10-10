@@ -15,13 +15,16 @@ class UserInfo(ndb.Model):
 	last_login_datetime = ndb.DateTimeProperty()
 	access_token_gen_datetime = ndb.DateTimeProperty()
 
-class UserSubscription(ndb.Model):
+class UserChannel(ndb.Model):
 	email = ndb.StringProperty()
-	channels = ndb.JsonProperty()
-	all_groups = ndb.JsonProperty()
-
-class Channels(ndb.Model):
-	channel_name = ndb.StringProperty()
 	channel_id = ndb.StringProperty()
+	group_name = ndb.StringProperty()
 
-	
+class Channel(ndb.Model):
+	channel_id = ndb.StringProperty()
+	channel_title = ndb.StringProperty()
+	channel_thumbnail = ndb.StringProperty()
+
+class UserPlayList(ndb.Model):
+	email = ndb.StringProperty()
+	playlist_id = ndb.StringProperty()

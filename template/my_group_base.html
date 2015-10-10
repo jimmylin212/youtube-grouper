@@ -14,14 +14,13 @@
   <body>
     {% block share_menu %}{% endblock %}
     <form method="post" action="">{% csrf_token %}
-  	  <div class="container-fluid" style="padding-top:70px;">
+      <div class="container-fluid" style="padding-top:70px;">
         <div class="raw">
           <div class="col-md-5">
             <div class="input-group">
               <span class="input-group-btn">
-                <button class="btn btn-default" type="submit" value="AddGroups" name="form_action">Add into Group</button>
+                <button class="btn btn-default" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
               </span>
-              <input type="text" class="form-control" placeholder="Group name..." name="group_name">
             </div>
           </div>
         </div>
@@ -30,19 +29,17 @@
       <div class="container-fluid">
         <div class="raw">
           <div class="col-md-12">
-          {% for group_name, channels in channel_groups.items %}
-            <h3><a href="/my_group/{{group_name}}">{{group_name}}</a></h3>
-            <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'>             
-              {% for channel in channels|dictsort:"channel_title" %}
-                <option data-img-label="{{channel.channel_title}}"
-                  data-img-src="{{channel.channel_thumbnail}}" value="{{channel.channel_id}}"></option>
-              {% endfor %}
+            <select multiple="multiple" class="image-picker show-label show-html" name='select_videos'>   
+              {% for video in group_upload_videos %}            
+              <option 
+                data-img-label="{{video.video_upload_date}}"
+                data-img-src="{{video.video_thumbnail}}" 
+                value="{{video.video_id}}"></option>
+              {% endfor %}  
             </select>
-            <hr>
-          {% endfor %}
           </div>
         </div>
-  	  </div>
+      </div>
     </form>
   </body>
 <html>

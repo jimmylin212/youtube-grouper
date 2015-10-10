@@ -1,53 +1,55 @@
 from db_utility import DBUtility
+from youtube_related import Youtube
 
 class Subscription:
-	def upsert_subscriptions(self, email, all_subscriptions):
+	def upsert_channel(self, email, channels):
+		user_channels = []
 		db_utility = DBUtility()
-
-		## Search in subscription to see if there is the data for the user
-		search_result = db_utility.search_subscription(email=email)
-
-		if search_result == None:
-			## Create new data for the user
-			insert_channels = {}
-			for subscription in all_subscriptions:
-				channelid = subscription['channelid']
-
-				insert_channels[channelid] = {}
-				insert_channels[channelid]['channel_id'] = channelid
-				insert_channels[channelid]['channel_title'] = subscription['title']
-				insert_channels[channelid]['channel_thumbnail'] = subscription['thumbnail']
-				insert_channels[channelid]['channel_group'] = "No Group"
-
-			db_utility.store_subscription(email=email, channels=insert_channels, all_groups=[])
-			return insert_channels
-		else:
-			## Check the subscription to see is there any new subscription
-			return search_result.channels
-
-	def create_group_based_dict(self, channels):
-		grouped_channels = {}
 
 		for channel in channels:
-			group_name = channels[channel]['channel_group']
-			
-			if group_name not in grouped_channels:
-				grouped_channels[group_name] = []
+			channel_id = channel['channelid']
+			## Store channel in UserChannel
+			search_user_channel_result = db_utility.search_user_channel(
+				'get', email=email, channel_id=channel_id)
 
-			grouped_channels[group_name].append(channels[channel])
+			if search_user_channel_result == None:
+				db_utility.store_user_channel(
+					email=email, channel_id=channel_id, group_name="No Group")
 
-		return grouped_channels
+			## Store channel infomation in Channel
+			search_channel_result = db_utility.search_channel(channel_id=channel_id)
 
-	def add_group_name(self, email, select_channel_ids, group_name):
+			if search_channel_result == None:
+				db_utility.store_channel(
+					channel_id=channel_id, channel_title=channel['title'],
+					channel_thumbnail=channel['thumbnail'])
+
+	def get_channel_groups(self, email):
+		channel_groups = {}
 		db_utility = DBUtility()
 
-		## Search in subscription to see if there is the data for the user
-		search_result = db_utility.search_subscription(email=email)
+		search_user_channel_results = db_utility.search_user_channel('fetch', email=email)
+
+		for search_user_channel_result in search_user_channel_results:
+			group_name = search_user_channel_result.group_name
+			channel_id = search_user_channel_result.channel_id
+			search_channel_result = db_utility.search_channel(channel_id=channel_id)
+
+			if group_name not in channel_groups:
+				channel_groups[group_name] = []
+
+			channel_groups[group_name].append(search_channel_result)
+
+		return channel_groups
+
+	def add_group(self, email, select_channel_ids, group_name):
+		db_utility = DBUtility()
 
 		for select_channel_id in select_channel_ids:
-			search_result.channels[select_channel_id]['channel_group'] = group_name
+			search_result = db_utility.search_user_channel('get', email=email, channel_id=select_channel_id)
+			if search_result == None:
+				db_utility.store_user_channel(email=email, channel_id=select_channel_id, group_name=group_name)
+			else:
+				search_result.group_name = group_name
+				db_utility.update_user_channel(search_result)
 
-			if group_name not in search_result.all_groups:
-				search_result.all_groups.append(group_name)
-
-		db_utility.update_subscription(search_result)
