@@ -11,6 +11,9 @@ class Youtube:
 
 	def api_querying(self, query_url, access_token, query_data=None):
 		request = urllib2.Request(url=query_url, data=query_data)
+		if query_data != None:
+			request.add_header('Content-Type', 'application/json')
+
 		request.add_header('Authorization', 'Bearer %s' % access_token)
 		response = urllib2.urlopen(request)
 		response = json.loads(response.read())
@@ -62,7 +65,7 @@ class Youtube:
 		upload_playlistitme_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
 
 		## Get the video in the upload play list
-		query_para = {'part' : 'contentDetails', 'playlistId' : upload_playlistitme_id, 'maxResults' : 50}
+		query_para = {'part' : 'contentDetails', 'playlistId' : upload_playlistitme_id, 'maxResults' : 30}
 		query_para = self.query_dict_2_para(query_para)
 		query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
 		response = self.api_querying(query_url, access_token)
@@ -98,9 +101,25 @@ class Youtube:
 
 		query_para = {'part' : 'snippet'}
 		query_para = self.query_dict_2_para(query_para)
-		query_data = {'snippet.title' : default_playlist_title, 'snippet.description' : default_playlist_description}
-		query_data = urllib.urlencode(query_data)
+		query_data = {'snippet' : {'title' : default_playlist_title, 'description' : default_playlist_description}}
+		query_data = json.dumps(query_data)
 		query_url = "%s%s" % (Youtube.playlist_url, query_para)
 		response = self.api_querying(query_url=query_url, access_token=access_token, query_data=query_data)
 
-		b = c
+		return response['id']
+
+	def add_video_into_playlist(self, email, playlist_id, video_id):
+		## Get access token from userinfo
+		user_related = UserRelated()
+		query_user_info = user_related.get_user_info(email=email)
+		access_token = query_user_info.access_token
+
+		query_para = {'part' : 'snippet'}
+		query_para = self.query_dict_2_para(query_para)
+		query_data = {'snippet' : {'playlistId' : playlist_id, 
+								   'resourceId' : {'videoId' : video_id, 'kind' : 'youtube#video'}}}
+		query_data = json.dumps(query_data)
+		query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
+		response = self.api_querying(query_url=query_url, access_token=access_token, query_data=query_data)
+
+		return response
