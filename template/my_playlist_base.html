@@ -1,0 +1,35 @@
+<html>
+  <head>
+    {% block share_head %}{% endblock %}
+    <script type="text/javascript" src="/static/js/image-picker.js"></script>
+    <script type="text/javascript" src="/static/js/image-picker.min.js"></script>
+    <link type="text/css" href="/static/css/image-picker.css" rel="stylesheet">
+    <script>
+      $(document).ready(function() {
+        $("select").imagepicker({show_label:true});
+      });
+    </script>
+    <style type="text/css"> .topbuffer { margin-top:20px; } </style>
+  </head>
+  <body>
+    {% block share_menu %}{% endblock %}
+    <div class="container-fluid" style="padding-top:70px;">
+      <div class="raw">
+        <div class="col-md-5">
+          <form method="post" action="">{% csrf_token %}
+            <button class="btn btn-default" type="submit" value="RemoveWatched" name="form_action">Remove Watched</button>
+          </form>
+        </div>
+      </div>
+    <div>
+    <hr>
+    <div class="container-fluid">
+      <div class="raw">
+        <div class="col-md-12">
+          <iframe src="https://www.youtube.com/embed/videoseries?list={{playlist_id}}" 
+                  frameborder="0" allowfullscreen width="835" height="480" ></iframe>
+        </div>
+      </div>
+    </div>
+  </body>
+<html>

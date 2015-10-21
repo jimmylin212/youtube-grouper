@@ -16,12 +16,11 @@
     <form method="post" action="">{% csrf_token %}
       <div class="container-fluid" style="padding-top:70px;">
         <div class="raw">
-          <div class="col-md-5">
-            <div class="input-group">
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
-              </span>
-            </div>
+          <div class="col-md-1">
+            <button class="btn btn-success" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
+          </div>
+          <div class="col-md-1 col-md-offset-9">
+            <button class="btn btn-danger" type="submit" value="RemoveGroup" name="form_action">Remove Group</button>
           </div>
         </div>
       </div>
@@ -32,8 +31,8 @@
             <select multiple="multiple" class="image-picker show-label show-html" name='select_videos'>   
               {% for video in group_upload_videos %}            
               <option 
-                data-img-label="{{video.video_upload_date}}"
-                data-img-src="{{video.video_thumbnail}}" 
+                data-img-label="{{video.upload_date}}"
+                data-img-src="{{video.thumbnail}}" 
                 value="{{video.video_id}}"></option>
               {% endfor %}  
             </select>

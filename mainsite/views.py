@@ -8,6 +8,7 @@ from mainsite.py_modules.user_related import UserRelated
 from mainsite.py_modules.subscription_related import Subscription
 from mainsite.py_modules.group_related import Group
 from mainsite.py_modules.playlist_related import PlayList
+from mainsite.py_modules.cronjob import CronJob
 
 def login(request):
 	passed_dict = {}
@@ -23,7 +24,7 @@ def authentication(request):
 		email = user_related.authentication(code=request.GET.get('code'))
 		request.session['email'] = email
 
-		return redirect('/home')
+		return redirect('/my_subscriptions')
 
 def my_subscriptions(request):
 	passed_dict = {}
@@ -42,11 +43,10 @@ def my_subscriptions(request):
 
 	all_channels = youtube.get_subscriptions(email)
 
-	## Check the subscription status every time use back to the page.
+	## Check the subscription status every time when user back to the page.
 	subscription_related.upsert_channel(email, all_channels)
 
 	channel_groups = subscription_related.get_channel_groups(email)
- 
 	passed_dict['email'] = email
 	passed_dict['channel_groups'] = channel_groups
 
@@ -63,9 +63,25 @@ def my_group(request, group_name):
 	if request.method == "POST" and request.POST.get('form_action') == 'AddPlayList':
 		select_videos = request.POST.getlist('select_videos')
 		playlist.add_videos(email, select_videos)
+		return redirect('/my_playlist/')
 
 	group_upload_videos = group.get_upload_viedos(email, group_name)
 
 	passed_dict['group_upload_videos'] = group_upload_videos
 	return render_to_response('my_group.html', passed_dict)
+
+def my_playlist(request):
+	passed_dict = {}
+	passed_dict.update(csrf(request))
+	playlist = PlayList()	
+
+	email = request.session.get('email')
+	playlist_id = playlist.check_playlist_exisxtence(email)
+
+	passed_dict['playlist_id'] = playlist_id
+	return render_to_response('my_playlist.html', passed_dict)
+
+def get_daily_uploaded_video(request):
+	cronjob = CronJob()
+	cronjob.get_daily_uplaod_videos()
 

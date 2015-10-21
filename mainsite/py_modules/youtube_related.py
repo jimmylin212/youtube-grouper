@@ -49,10 +49,8 @@ class Youtube:
 
 		return all_subscriptions
 
-	def get_upload_viedos(self, channel_id, email):
-		upload_videos = []
+	def get_channel_details(self, channel_id, email):
 		user_related = UserRelated()
-
 		## Get access token from userinfo
 		query_user_info = user_related.get_user_info(email=email)
 		access_token = query_user_info.access_token
@@ -62,10 +60,20 @@ class Youtube:
 		query_para = self.query_dict_2_para(query_para)
 		query_url = "%s%s" % (Youtube.channel_url, query_para)
 		response = self.api_querying(query_url, access_token)
-		upload_playlistitme_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+
+		return response
+
+	def get_upload_viedos(self, playlist_id, email):
+		upload_videos = []
+		user_related = UserRelated()
+		show_days_delta = 14
+
+		## Get access token from userinfo
+		query_user_info = user_related.get_user_info(email=email)
+		access_token = query_user_info.access_token
 
 		## Get the video in the upload play list
-		query_para = {'part' : 'contentDetails', 'playlistId' : upload_playlistitme_id, 'maxResults' : 30}
+		query_para = {'part' : 'contentDetails', 'playlistId' : playlist_id, 'maxResults' : 50}
 		query_para = self.query_dict_2_para(query_para)
 		query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
 		response = self.api_querying(query_url, access_token)
@@ -79,14 +87,17 @@ class Youtube:
 			query_url = "%s%s" % (Youtube.videos_url, query_para)
 			response = self.api_querying(query_url, access_token)
 
-			temp_dict['video_id'] = video_id
-			temp_dict['video_upload_date'] = response['items'][0]['snippet']['publishedAt'].split('T')[0]
-			temp_dict['video_thumbnail'] = response['items'][0]['snippet']['thumbnails']['default']['url']
-			temp_dict['video_title'] = response['items'][0]['snippet']['title']
-			temp_dict['channel_title'] = response['items'][0]['snippet']['channelTitle']
+			video_upload_date = response['items'][0]['snippet']['publishedAt'].split('T')[0]
+			if (datetime.datetime.now() - datetime.datetime.strptime(video_upload_date, '%Y-%m-%d')).days > show_days_delta:
+				break
+			else:
+				temp_dict['video_id'] = video_id
+				temp_dict['video_upload_date'] = video_upload_date
+				temp_dict['video_thumbnail'] = response['items'][0]['snippet']['thumbnails']['default']['url']
+				temp_dict['video_title'] = response['items'][0]['snippet']['title']
+				temp_dict['channel_title'] = response['items'][0]['snippet']['channelTitle']
 
-			upload_videos.append(temp_dict)
-
+				upload_videos.append(temp_dict)
 		return upload_videos
 
 	def add_new_playlist(self, email):
@@ -99,9 +110,10 @@ class Youtube:
 		default_playlist_title = 'YouGroupe'
 		default_playlist_description = 'Playlist for YouGroupe'
 
-		query_para = {'part' : 'snippet'}
+		query_para = {'part' : 'snippet,status'}
 		query_para = self.query_dict_2_para(query_para)
-		query_data = {'snippet' : {'title' : default_playlist_title, 'description' : default_playlist_description}}
+		query_data = {'snippet' : {'title' : default_playlist_title, 'description' : default_playlist_description},
+					  'status' : {'privacyStatus' : 'public'}}
 		query_data = json.dumps(query_data)
 		query_url = "%s%s" % (Youtube.playlist_url, query_para)
 		response = self.api_querying(query_url=query_url, access_token=access_token, query_data=query_data)

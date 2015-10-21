@@ -1,4 +1,4 @@
-from ..models import UserInfo, Channel, UserChannel, UserPlayList
+from ..models import UserInfo, Channel, UserChannel, UserPlayList, Video
 
 class DBUtility:
 	def store_userinfo(self, **kwargs):
@@ -32,8 +32,11 @@ class DBUtility:
 		store_key = store_document.put()
 		return store_key
 
-	def search_channel(self, **kwargs):
-		return Channel.query(*(getattr(Channel, k)==v for (k,v) in kwargs.items())).get()
+	def search_channel(self, operation, **kwargs):
+		if operation == '==':
+			return Channel.query(*(getattr(Channel, k)==v for (k,v) in kwargs.items())).get()
+		elif operation == '!=':
+			return Channel.query(*(getattr(Channel, k)!=v for (k,v) in kwargs.items())).fetch()
 
 	def update_channel(self, update_document):
 		update_document.put()
@@ -46,3 +49,11 @@ class DBUtility:
 		store_document = UserPlayList(**kwargs)
 		store_key = store_document.put()
 		return store_key
+
+	def store_video(self, **kwargs):
+		store_document = Video(**kwargs)
+		store_key = store_document.put()
+		return store_key
+
+	def search_video(self, **kwargs):
+		return Video.query(*(getattr(Video, k)==v for (k,v) in kwargs.items())).fetch()

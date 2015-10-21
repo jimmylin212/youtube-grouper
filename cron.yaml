@@ -1,0 +1,4 @@
+cron:
+- description: daily summary job
+  url: /get_daily_uploaded_video/
+  schedule: every day 00:05

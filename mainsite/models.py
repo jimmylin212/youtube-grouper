@@ -22,9 +22,19 @@ class UserChannel(ndb.Model):
 
 class Channel(ndb.Model):
 	channel_id = ndb.StringProperty()
-	channel_title = ndb.StringProperty()
-	channel_thumbnail = ndb.StringProperty()
+	title = ndb.StringProperty()
+	thumbnail = ndb.StringProperty()
+	groups = ndb.JsonProperty(indexed=True)
+	upload_playlist_id = ndb.StringProperty()
+	latest_video_id = ndb.StringProperty()
 
 class UserPlayList(ndb.Model):
 	email = ndb.StringProperty()
 	playlist_id = ndb.StringProperty()
+
+class Video(ndb.Model):
+	channel_id = ndb.StringProperty()
+	video_id = ndb.StringProperty()
+	upload_date = ndb.DateProperty()
+	title = ndb.StringProperty()
+	thumbnail = ndb.StringProperty()
