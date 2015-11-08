@@ -7,4 +7,5 @@ urlpatterns = patterns('',
     url(r'^my_playlist/$', 'mainsite.views.my_playlist'),
     url(r'^authentication/$', 'mainsite.views.authentication'),
     url(r'^get_daily_uploaded_video/$', 'mainsite.views.get_daily_uploaded_video'),
+    url(r'^$', 'mainsite.views.home'),
 )

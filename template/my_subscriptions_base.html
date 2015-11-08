@@ -1,12 +1,22 @@
 <html>
   <head>
     {% block share_head %}{% endblock %}
+    <!-- Tag It -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="/static/js/tag-it.js"></script>
+    <link type="text/css" href="/static/css/tagit.css" rel="stylesheet">
+    <link type="text/css" href="/static/css/tagit.ui-zendesk.css" rel="stylesheet">
+
+    <!-- Image picker -->
     <script type="text/javascript" src="/static/js/image-picker.js"></script>
     <script type="text/javascript" src="/static/js/image-picker.min.js"></script>
     <link type="text/css" href="/static/css/image-picker.css" rel="stylesheet">
     <script>
       $(document).ready(function() {
         $("select").imagepicker({show_label:true});
+        $('#tagitinput').tagit({
+           singleField:true 
+        });
       });
     </script>
     <style type="text/css"> .topbuffer { margin-top:20px; } </style>
@@ -16,13 +26,11 @@
     <form method="post" action="">{% csrf_token %}
   	  <div class="container-fluid" style="padding-top:70px;">
         <div class="raw">
+          <div class="col-md-1">
+            <button class="btn btn-default" type="submit" value="AddGroups" name="form_action">Add</button>
+          </div>
           <div class="col-md-5">
-            <div class="input-group">
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="submit" value="AddGroups" name="form_action">Add into Group</button>
-              </span>
-              <input type="text" class="form-control" placeholder="Group name..." name="group_name">
-            </div>
+            <ul id="tagitinput"></ul>
           </div>
         </div>
       </div>
@@ -30,14 +38,9 @@
       <div class="container-fluid">
         <div class="raw">
           <div class="col-md-12">
-          {% for group_name, channels in channel_groups.items %}
-            <h3>
-              {% if group_name == 'No Group' %}
-                {{ group_name}}
-              {% else %}
-                <a href="/my_group/{{group_name}}">{{group_name}}</a>
-              {% endif %}
-            </h3>
+          {% if channel_groups %}
+            {% for group_name, channels in channel_groups.items %}
+            <h3><a href="/my_group/{{group_name}}">{{group_name}}</a></h3>
             <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'>             
               {% for channel in channels|dictsort:"title" %}
                 <option data-img-label="{{channel.title}}"
@@ -45,7 +48,18 @@
               {% endfor %}
             </select>
             <hr>
-          {% endfor %}
+            {% endfor %}
+          {% endif %}
+
+          {% if no_groups %}
+            <hr>
+            <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'> 
+            {% for channel in no_groups|dictsort:"title" %}
+              <option data-img-label="{{channel.title}}"
+                  data-img-src="{{channel.thumbnail}}" value="{{channel.channel_id}}"></option>
+            {% endfor %}
+            </select>
+          {% endif %}
           </div>
         </div>
   	  </div>

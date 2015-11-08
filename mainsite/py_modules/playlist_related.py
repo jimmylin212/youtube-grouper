@@ -1,4 +1,4 @@
-from db_utility import DBUtility
+from ..models import UserPlayList
 from youtube_related import Youtube
 
 class PlayList:
@@ -12,14 +12,14 @@ class PlayList:
 		return
 
 	def check_playlist_exisxtence(self, email):
-		db_utility = DBUtility()
 		youtube_related = Youtube()
 
-		db_playlist_result = db_utility.search_user_playlist(email=email)
+		db_playlist_result = UserPlayList.query(UserPlayList.email == email).get()
 
 		if db_playlist_result == None:
 			playlist_id = youtube_related.add_new_playlist(email)
-			db_utility.store_user_playlist(email=email, playlist_id=playlist_id)
+
+			UserPlayList(email=email, playlist_id=playlist_id).put()
 		else:
 			playlist_id = db_playlist_result.playlist_id
 

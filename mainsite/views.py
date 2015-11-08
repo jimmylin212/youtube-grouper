@@ -14,6 +14,9 @@ def login(request):
 	passed_dict = {}
 	return render_to_response('login.html', passed_dict) 
 
+def home(request):
+	return redirect('/my_subscriptions')
+
 def authentication(request):
 	user_related = UserRelated()
 
@@ -35,20 +38,23 @@ def my_subscriptions(request):
 	subscription_related = Subscription()
 	
 	email = request.session.get('email')
+	if email == None:
+		return redirect('/login')
 
 	if request.method == "POST" and request.POST.get('form_action') == 'AddGroups':
 		select_subscriptions = request.POST.getlist('select_subscriptions')
-		group_name = request.POST.get('group_name')
-		subscription_related.add_group(email, select_subscriptions, group_name)
+		group_names = request.POST.get('tags')
+		subscription_related.add_group(email, select_subscriptions, group_names)
 
 	all_channels = youtube.get_subscriptions(email)
 
 	## Check the subscription status every time when user back to the page.
 	subscription_related.upsert_channel(email, all_channels)
 
-	channel_groups = subscription_related.get_channel_groups(email)
+	channel_groups, no_groups = subscription_related.get_channel_groups(email)
 	passed_dict['email'] = email
 	passed_dict['channel_groups'] = channel_groups
+	passed_dict['no_groups'] = no_groups
 
 	return render_to_response('my_subscriptions.html', passed_dict)
 
@@ -59,6 +65,8 @@ def my_group(request, group_name):
 	playlist = PlayList()
 
 	email = request.session.get('email')
+	if email == None:
+		return redirect('/login')
 
 	if request.method == "POST" and request.POST.get('form_action') == 'AddPlayList':
 		select_videos = request.POST.getlist('select_videos')
@@ -76,6 +84,9 @@ def my_playlist(request):
 	playlist = PlayList()	
 
 	email = request.session.get('email')
+	if email == None:
+		return redirect('/login')
+
 	playlist_id = playlist.check_playlist_exisxtence(email)
 
 	passed_dict['playlist_id'] = playlist_id
@@ -84,4 +95,6 @@ def my_playlist(request):
 def get_daily_uploaded_video(request):
 	cronjob = CronJob()
 	cronjob.get_daily_uplaod_videos()
+
+	return render_to_response('dummy_cronjob_page.html')
 

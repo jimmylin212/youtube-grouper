@@ -18,7 +18,7 @@ class UserInfo(ndb.Model):
 class UserChannel(ndb.Model):
 	email = ndb.StringProperty()
 	channel_id = ndb.StringProperty()
-	group_name = ndb.StringProperty()
+	group_name = ndb.JsonProperty(indexed=True)
 
 class Channel(ndb.Model):
 	channel_id = ndb.StringProperty()

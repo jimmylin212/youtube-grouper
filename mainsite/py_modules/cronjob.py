@@ -1,6 +1,6 @@
 import urllib2, datetime, re
 import xml.etree.ElementTree as etree
-from db_utility import DBUtility
+from ..models import Channel, Video
 from youtube_related import Youtube
 
 class CronJob:
@@ -14,11 +14,11 @@ class CronJob:
 		upload_date_ptn = re.compile('\<published\>(.*?)\<\/published\>')
 		thumbnail_ptn = re.compile('media\:thumbnail url\=\"(.*?)\"')
 
-		temp = []
-		db_utility = DBUtility()
 		youtube_related = Youtube()
 
-		channels = db_utility.search_channel('!=', groups=None)
+		## Get the channel with tags
+		channels = Channel.query(Channel.groups != None).fetch()
+
 		for channel in channels:
 			channel_id = channel.channel_id
 			feed_url = '%s%s' % (CronJob.feed_url_prefix, channel.channel_id)
@@ -38,9 +38,9 @@ class CronJob:
 				if video_id != None and title != None and upload_date != None and upload_date == day_before:
 					
 					upload_date = datetime.datetime.strptime(upload_date, '%Y-%m-%d')
-					db_utility.store_video(channel_id=channel_id, title=title, 
-						video_id=video_id, upload_date=upload_date, thumbnail=thumbnail)
-				else:
-					temp.append([video_id, title, upload_date])
+					## Store new uploaded video
+					store_doc = Video(channel_id=channel_id, title=title, video_id=video_id, 
+									  upload_date=upload_date, thumbnail=thumbnail)
+					store_doc.put()
 
 

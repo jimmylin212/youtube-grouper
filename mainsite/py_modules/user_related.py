@@ -1,5 +1,5 @@
 import json, os, urllib, httplib, urllib2, datetime
-from db_utility import DBUtility
+from ..models import UserInfo
 
 class UserRelated:
 	scopes = ['https://www.googleapis.com/auth/youtube',
@@ -76,52 +76,49 @@ class UserRelated:
 		self.update_auth_data(email, tokens)
 
 	def store_auth_data(self, tokens, user_info):
-		db_utility = DBUtility()
 
-		query_result = db_utility.search_userinfo(email=user_info['email'])
+		query_result = UserInfo.query(UserInfo.email == user_info['email']).get()
 		if query_result == None:
-			user_info_key = db_utility.store_userinfo(
-				email=user_info['email'], 
-				name=user_info['name'], 
-		 		picture=user_info['picture'], 
-		 		google_id=user_info['id'], 
-		 		access_token=tokens['access_token'],
-		 		expires_in=tokens['expires_in'],
-		 		token_type=tokens['token_type'],
-		 		refresh_token=tokens['refresh_token'],
-		 		id_token=tokens['id_token'],
-		 		register_datetime=datetime.datetime.now(), 
-		 		last_login_datetime=datetime.datetime.now(), 
-		 		access_token_gen_datetime=datetime.datetime.now())
+			UserInfo(email=user_info['email'], 
+					 name=user_info['name'], 
+		 			 picture=user_info['picture'], 
+		 			 google_id=user_info['id'], 
+		 			 access_token=tokens['access_token'],
+		 			 expires_in=tokens['expires_in'],
+		 			 token_type=tokens['token_type'],
+		 			 refresh_token=tokens['refresh_token'],
+		 			 id_token=tokens['id_token'],
+		 			 register_datetime=datetime.datetime.now(), 
+		 			 last_login_datetime=datetime.datetime.now(), 
+		 			 access_token_gen_datetime=datetime.datetime.now()).put()
 			
 			## Query again to get user data
-			query_result = db_utility.search_userinfo(email=user_info['email'])
+			query_result = UserInfo.query(UserInfo.email == user_info['email']).get()
 
 		else:
 			query_result.last_loging_datetime = datetime.datetime.now()
-			db_utility.update_userinfo(query_result)
+			query_result.put()
 
 		return query_result
 
 	def update_auth_data(self, email, tokens):
-		db_utility = DBUtility()
 
-		query_result = db_utility.search_userinfo(email=email)
+		query_result = UserInfo.query(UserInfo.email == email).get()
 
 		query_result.access_token = tokens['access_token']
 		query_result.expires_in = tokens['expires_in']
 		query_result.access_token_gen_datetime = datetime.datetime.now()
-		db_utility.update_userinfo(query_result)
+		query_result.put()
 
 
 	def get_user_info(self, email):
-		db_utility = DBUtility()
-		query_result = db_utility.search_userinfo(email=email)
+
+		query_result = UserInfo.query(UserInfo.email == email).get()
 
 		if (datetime.datetime.now() - query_result.access_token_gen_datetime).total_seconds() > query_result.expires_in:
 			## Access toekn is expired, refresh it.
 			self.refresh_access_token(email=email, refresh_token=query_result.refresh_token)
-			query_result = db_utility.search_userinfo(email=email)
+			query_result = UserInfo(UserInfo.email == email)
 
 		return query_result
 
