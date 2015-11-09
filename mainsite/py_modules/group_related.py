@@ -8,6 +8,9 @@ class Group:
 
 		group_details = UserChannel.query(UserChannel.email == email).fetch()
 		for group_detail in group_details:
+			if group_detail.group_name == None:
+				continue
+				
 			if group_name in group_detail.group_name:
 				## Use the channel id to query video to get the information of the video.
 				channel_upload_videos = Video.query(Video.channel_id == group_detail.channel_id)
@@ -20,4 +23,20 @@ class Group:
 
 		upload_videos = sorted(upload_videos, key=lambda k: k['upload_date'], reverse=True)
 		return upload_videos
+
+	def remove_group(self, email, group_name):
+		group_details = UserChannel.query(UserChannel.email == email).fetch()
+
+		for group_detail in group_details:
+			if group_detail.group_name == None:
+				continue
+
+			if group_name in group_detail.group_name:
+				user_channel_detail = UserChannel.query(UserChannel.channel_id == group_detail.channel_id, 
+												  	    UserChannel.email == email).get()
+				user_channel_detail.group_name.remove(group_name)
+				if user_channel_detail.group_name == []:
+					user_channel_detail.group_name = None
+
+				user_channel_detail.put()
 

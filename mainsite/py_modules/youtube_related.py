@@ -63,6 +63,19 @@ class Youtube:
 
 		return response
 
+	def get_mine_channel_details(self, email):
+		user_related = UserRelated()
+		## Get access token from userinfo
+		query_user_info = user_related.get_user_info(email=email)
+		access_token = query_user_info.access_token
+
+		query_para = {'part' : 'contentDetails', 'mine' : 'true'}
+		query_para = self.query_dict_2_para(query_para)
+		query_url = "%s%s" % (Youtube.channel_url, query_para)
+		response = self.api_querying(query_url, access_token)
+
+		return response
+
 	def get_upload_viedos(self, playlist_id, email):
 		upload_videos = []
 		user_related = UserRelated()
@@ -135,3 +148,7 @@ class Youtube:
 		response = self.api_querying(query_url=query_url, access_token=access_token, query_data=query_data)
 
 		return response
+
+	def remove_watched_from_playlist(self, playlist_id):
+		
+		return

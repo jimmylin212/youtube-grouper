@@ -31,6 +31,7 @@ class Channel(ndb.Model):
 class UserPlayList(ndb.Model):
 	email = ndb.StringProperty()
 	playlist_id = ndb.StringProperty()
+	watchhistory_playlist_id = ndb.StringProperty()
 
 class Video(ndb.Model):
 	channel_id = ndb.StringProperty()

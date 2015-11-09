@@ -32,7 +32,7 @@ class CronJob:
 			for entry in entries:
 				video_id = video_id_ptn.findall(entry)[0]
 				title = title_ptn.findall(entry)[0]
-				thumbnail = thumbnail_ptn.findall(entry)[0].replace('hqdefault.jpg', 'default.jpg')
+				thumbnail = thumbnail_ptn.findall(entry)[0]
 				upload_date = upload_date_ptn.findall(entry)[0].split('T')[0]
 
 				if video_id != None and title != None and upload_date != None and upload_date == day_before:

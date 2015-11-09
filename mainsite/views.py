@@ -72,20 +72,30 @@ def my_group(request, group_name):
 		select_videos = request.POST.getlist('select_videos')
 		playlist.add_videos(email, select_videos)
 		return redirect('/my_playlist/')
+	elif request.method == "POST" and request.POST.get('form_action') == 'RemoveTag':
+		group.remove_group(email, group_name)
+		return redirect('/my_subscriptions/')
 
 	group_upload_videos = group.get_upload_viedos(email, group_name)
 
 	passed_dict['group_upload_videos'] = group_upload_videos
+	passed_dict['group_name'] = group_name
 	return render_to_response('my_group.html', passed_dict)
 
 def my_playlist(request):
 	passed_dict = {}
 	passed_dict.update(csrf(request))
+	youtube = Youtube()
 	playlist = PlayList()	
 
 	email = request.session.get('email')
 	if email == None:
 		return redirect('/login')
+
+	playlist_id = playlist.check_playlist_exisxtence(email)
+
+	if request.method == 'POST' and request.POST.get('form_action') == 'RemoveWatched':
+		youtube.remove_watched_from_playlist(playlist_id)
 
 	playlist_id = playlist.check_playlist_exisxtence(email)
 

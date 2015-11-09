@@ -59,7 +59,8 @@ class Subscription:
 															   UserChannel.channel_id == select_channel_id).get()
 				
 				if search_user_channel_result.group_name == None:
-					UserChannel(email=email, channel_id=select_channel_id, group_name=[group_name]).put()
+					search_user_channel_result.group_name = [group_name]
+					search_user_channel_result.put()
 				else:
 					if group_name not in search_user_channel_result.group_name:
 						search_user_channel_result.group_name.append(group_name)

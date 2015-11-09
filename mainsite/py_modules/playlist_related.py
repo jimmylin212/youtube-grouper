@@ -14,12 +14,16 @@ class PlayList:
 	def check_playlist_exisxtence(self, email):
 		youtube_related = Youtube()
 
+		## Get the user's watch history playlist id
+		mine_channel_response = youtube_related.get_mine_channel_details(email)
+		watch_history_playlist_id = mine_channel_response['items']['contentDetails']['relatedPlaylists']['watchHistory']
+
+		## Search if the user already have yougroupe playlist
 		db_playlist_result = UserPlayList.query(UserPlayList.email == email).get()
 
 		if db_playlist_result == None:
 			playlist_id = youtube_related.add_new_playlist(email)
-
-			UserPlayList(email=email, playlist_id=playlist_id).put()
+			UserPlayList(email=email, playlist_id=playlist_id, watchhistory_playlist_id=watch_history_playlist_id).put()
 		else:
 			playlist_id = db_playlist_result.playlist_id
 

@@ -1,43 +1,43 @@
 <html>
   <head>
     {% block share_head %}{% endblock %}
-    <script type="text/javascript" src="/static/js/image-picker.js"></script>
-    <script type="text/javascript" src="/static/js/image-picker.min.js"></script>
-    <link type="text/css" href="/static/css/image-picker.css" rel="stylesheet">
     <script>
       $(document).ready(function() {
-        $("select").imagepicker({show_label:true});
+        $(":checkbox").on("change", function() {
+          $(this).parent().toggleClass("checked", this.checked);
+        });​
       });
     </script>
-    <style type="text/css"> .topbuffer { margin-top:20px; } </style>
+    <style type="text/css"> .checked { background-color: #ff0000;} ​</style>
   </head>
   <body>
     {% block share_menu %}{% endblock %}
     <form method="post" action="">{% csrf_token %}
-      <div class="container-fluid" style="padding-top:70px;">
-        <div class="raw">
-          <div class="col-md-1">
-            <button class="btn btn-success" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
-          </div>
-          <div class="col-md-1 col-md-offset-9">
-            <button class="btn btn-danger" type="submit" value="RemoveGroup" name="form_action">Remove Group</button>
-          </div>
+      <div class="container" style="padding-top:70px;">
+        <div class="row">
+            <div class="col-lg-4">
+              <h2>{{group_name}}</h2>
+            </div>
+            <div class="col-lg-4 col-lg-offset-4">
+              <h2 style="float:right;">
+                <button class="btn btn-success" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
+                <button class="btn btn-danger" type="submit" value="RemoveTag" name="form_action">Remove Tag</button>
+              </h2>
+            </div>
         </div>
-      </div>
-      <hr>
-      <div class="container-fluid">
-        <div class="raw">
-          <div class="col-md-12">
-            <select multiple="multiple" class="image-picker show-label show-html" name='select_videos'>   
-              {% for video in group_upload_videos %}            
-              <option 
-                data-img-label="{{video.upload_date}}"
-                data-img-src="{{video.thumbnail}}" 
-                value="{{video.video_id}}"></option>
-              {% endfor %}  
-            </select>
+        <hr>
+        <div class="row">
+          {% for video in group_upload_videos %}
+          <div class="col-md-3 portfolio-item">
+            <a href="#"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>            
+            <h5><input type="checkbox" value="{{video.video_id}}" name="select_videos">
+              &nbsp;&nbsp;&nbsp;<a href="#">{{video.title}}</a>
+            </h5>
+            <p>Uploaded on {{video.upload_date}}</p>
           </div>
+          {% endfor %}
         </div>
+        <!-- /.row -->
       </div>
     </form>
   </body>

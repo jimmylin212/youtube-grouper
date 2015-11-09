@@ -118,7 +118,7 @@ class UserRelated:
 		if (datetime.datetime.now() - query_result.access_token_gen_datetime).total_seconds() > query_result.expires_in:
 			## Access toekn is expired, refresh it.
 			self.refresh_access_token(email=email, refresh_token=query_result.refresh_token)
-			query_result = UserInfo(UserInfo.email == email)
+			query_result = UserInfo.query(UserInfo.email == email).get()
 
 		return query_result
 
