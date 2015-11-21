@@ -2,3 +2,8 @@ cron:
 - description: daily summary job
   url: /get_daily_uploaded_video/
   schedule: every day 00:05
+
+- description: daily check video status
+  url: /daily_check_video_status/
+  schedule: every day 00:10
+    

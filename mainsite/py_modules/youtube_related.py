@@ -1,4 +1,4 @@
-import urllib, urllib2, json, datetime
+import urllib, urllib2, json, datetime, httplib, urlparse
 from user_related import UserRelated
 
 class Youtube:
@@ -19,8 +19,29 @@ class Youtube:
 		response = json.loads(response.read())
 		return response
 
+	def api_querying_method(self, method, query_domain, query_path, access_token):
+		headers = {'Authorization' : 'Bearer %s' % access_token}
+
+		connection = httplib.HTTPSConnection(query_domain)
+		connection.request(method, query_path, '', headers) 
+		response = connection.getresponse()
+		return response.read()
+
 	def query_dict_2_para(self, query_dict):
 		return '&'.join(['{}={}'.format(key, value) for key, value in query_dict.iteritems()])
+
+	def query_video(self, email, video_id):
+		## Get access token from userinfo
+		user_related = UserRelated()
+		query_user_info = user_related.get_user_info(email=email)
+		access_token = query_user_info.access_token
+
+		query_para = {'part' : 'snippet', 'id' : video_id}
+		query_para = self.query_dict_2_para(query_para)
+		query_url = "%s%s" % (Youtube.videos_url, query_para)
+		response = self.api_querying(query_url, access_token)
+
+		return response
 
 	def get_subscriptions(self, email):
 		all_subscriptions = []
@@ -149,6 +170,73 @@ class Youtube:
 
 		return response
 
-	def remove_watched_from_playlist(self, playlist_id):
-		
-		return
+	def remove_all_from_playlist(self, email, playlist_id):
+		## Get access token from userinfo
+		user_related = UserRelated()
+		query_user_info = user_related.get_user_info(email=email)
+		access_token = query_user_info.access_token
+
+		yougroupe_playlist_videos = [] 
+		query_para = {'part' : 'snippet', 'maxResults' : '50', 'playlistId' : playlist_id}
+		query_para = self.query_dict_2_para(query_para)
+		while True:
+			query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
+			response = self.api_querying(query_url=query_url, access_token=access_token)
+			yougroupe_playlist_videos.extend(response['items'])
+			if 'nextPageToken' in response:
+				query_para = {'part' : 'snippet', 'maxResults' : '50',
+							  'playlistId' : playlist_id, 'pageToken' : response['nextPageToken']}
+				query_para = self.query_dict_2_para(query_para)
+			else:
+				break
+
+		for video_detail in yougroupe_playlist_videos:
+			playlist_item_id = video_detail['id']
+			video_id = video_detail['snippet']['resourceId']['videoId']
+
+			query_para = {'id' : playlist_item_id}
+			query_para = self.query_dict_2_para(query_para)
+			query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
+			parsed_query_url = urlparse.urlparse(query_url)
+
+			query_domain = parsed_query_url.netloc
+			query_path_para = '%s?%s' % (parsed_query_url.path, parsed_query_url.query)
+			response = self.api_querying_method("DELETE", query_domain, query_path_para, access_token)
+
+	def remove_watched_from_playlist(self, email, playlist_id, watch_history_playlist_id):
+		## Get access token from userinfo
+		user_related = UserRelated()
+		query_user_info = user_related.get_user_info(email=email)
+		access_token = query_user_info.access_token
+
+		yougroupe_playlist_videos = [] 
+		query_para = {'part' : 'snippet', 'maxResults' : '50', 'playlistId' : playlist_id}
+		query_para = self.query_dict_2_para(query_para)
+		while True:
+			query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
+			response = self.api_querying(query_url=query_url, access_token=access_token)
+			yougroupe_playlist_videos.extend(response['items'])
+			if 'nextPageToken' in response:
+				query_para['nextPageToken'] = response['nextPageToken']
+				query_para = self.query_dict_2_para(query_para)
+			else:
+				break
+
+		for video_detail in yougroupe_playlist_videos:
+			playlist_item_id = video_detail['id']
+			video_id = video_detail['snippet']['resourceId']['videoId']
+			
+			## Query to see if the video in watch history		
+			query_para = {'part' : 'contentDetails', 'videoId' : video_id, 'playlistId' : watch_history_playlist_id}
+			query_para = self.query_dict_2_para(query_para)
+			query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
+			response = self.api_querying(query_url=query_url, access_token=access_token)
+
+			if response['pageInfo']['totalResults'] == 1:
+				query_para = {'id' : playlist_item_id}
+				query_para = self.query_dict_2_para(query_para)
+				query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
+
+				query_domain = parsed_query_url.netloc
+				query_path_para = '%s?%s' % (parsed_query_url.path, parsed_query_url.query)
+				response = self.api_querying_method("DELETE", query_domain, query_path_para, access_token)

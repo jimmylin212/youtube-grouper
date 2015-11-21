@@ -16,7 +16,9 @@ class PlayList:
 
 		## Get the user's watch history playlist id
 		mine_channel_response = youtube_related.get_mine_channel_details(email)
-		watch_history_playlist_id = mine_channel_response['items']['contentDetails']['relatedPlaylists']['watchHistory']
+		for item in mine_channel_response['items']:
+			if 'contentDetails' in item:
+				watch_history_playlist_id = item['contentDetails']['relatedPlaylists']['watchHistory']
 
 		## Search if the user already have yougroupe playlist
 		db_playlist_result = UserPlayList.query(UserPlayList.email == email).get()
@@ -28,3 +30,7 @@ class PlayList:
 			playlist_id = db_playlist_result.playlist_id
 
 		return playlist_id
+
+	def get_watch_history_playlist_id(self, email):
+		db_playlist_result = UserPlayList.query(UserPlayList.email == email).get()
+		return db_playlist_result.watchhistory_playlist_id

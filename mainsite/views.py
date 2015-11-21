@@ -95,12 +95,22 @@ def my_playlist(request):
 	playlist_id = playlist.check_playlist_exisxtence(email)
 
 	if request.method == 'POST' and request.POST.get('form_action') == 'RemoveWatched':
-		youtube.remove_watched_from_playlist(playlist_id)
+		watchhistory_playlist_id = playlist.get_watch_history_playlist_id(email)
+		youtube.remove_watched_from_playlist(email, playlist_id, watchhistory_playlist_id)
+	elif request.method == 'POST' and request.POST.get('form_action') == 'RemoveAll':
+		youtube.remove_all_from_playlist(email, playlist_id)
 
 	playlist_id = playlist.check_playlist_exisxtence(email)
 
 	passed_dict['playlist_id'] = playlist_id
 	return render_to_response('my_playlist.html', passed_dict)
+
+def watch_video(request, video_id):
+	passed_dict = {}
+	passed_dict.update(csrf(request))
+
+	passed_dict['video_id'] = video_id
+	return render_to_response('watch_video.html', passed_dict)
 
 def get_daily_uploaded_video(request):
 	cronjob = CronJob()
@@ -108,3 +118,17 @@ def get_daily_uploaded_video(request):
 
 	return render_to_response('dummy_cronjob_page.html')
 
+def daily_check_video_status(request):
+	cronjob = CronJob()
+	cronjob.daily_check_video_status()
+	return render_to_response('dummy_cronjob_page.html')	
+
+def daily_check_channel_status(request):
+	cronjob = CronJob()
+	cronjob.daily_check_channel_status()
+	return render_to_response('dummy_cronjob_page.html')	
+
+def perge_old_videos(request):
+	cronjob = CronJob()
+	cronjob.perge_old_videos()
+	return render_to_response('dummy_cronjob_page.html')	

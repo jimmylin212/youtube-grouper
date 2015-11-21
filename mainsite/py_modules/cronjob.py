@@ -4,6 +4,7 @@ from ..models import Channel, Video
 from youtube_related import Youtube
 
 class CronJob:
+	query_email = r'jimmylin212@gmail.com'
 	feed_url_prefix = r'https://www.youtube.com/feeds/videos.xml?channel_id='
 
 	def get_daily_uplaod_videos(self):
@@ -42,5 +43,21 @@ class CronJob:
 					store_doc = Video(channel_id=channel_id, title=title, video_id=video_id, 
 									  upload_date=upload_date, thumbnail=thumbnail)
 					store_doc.put()
+
+	def daily_check_video_status(self):
+		youtube_related = Youtube()
+
+		video_details = Video.query().fetch()
+		for video_detail in video_details:
+			response = youtube_related.query_video(CronJob.query_email, video_detail.video_id)
+			if response['pageInfo']['totalResults'] == 0:
+				video_detail.key.delete()
+
+	def daily_check_channel_status(self):
+		youtube_related = Youtube()
+		return	
+
+	def perge_old_videos(self):
+		return
 
 

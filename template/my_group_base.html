@@ -2,34 +2,44 @@
   <head>
     {% block share_head %}{% endblock %}
     <script>
-      $(document).ready(function() {
-        $(":checkbox").on("change", function() {
-          $(this).parent().toggleClass("checked", this.checked);
-        });​
+      $(document).ready(function(){
+        $('#checkAll').click(function () {    
+          $('input:checkbox').prop('checked', this.checked);    
+        });
       });
     </script>
-    <style type="text/css"> .checked { background-color: #ff0000;} ​</style>
   </head>
   <body>
     {% block share_menu %}{% endblock %}
     <form method="post" action="">{% csrf_token %}
       <div class="container" style="padding-top:70px;">
         <div class="row">
-            <div class="col-lg-4">
-              <h2>{{group_name}}</h2>
+          <div class="col-lg-4">
+            <h2>{{group_name}}</h2>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-4 col-lg-offset-8">
+            <div style="float:right;">
+              <button class="btn btn-success" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
+              <button class="btn btn-danger" type="submit" value="RemoveTag" name="form_action" disabled="disabled">Remove Tag</button>
             </div>
-            <div class="col-lg-4 col-lg-offset-4">
-              <h2 style="float:right;">
-                <button class="btn btn-success" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
-                <button class="btn btn-danger" type="submit" value="RemoveTag" name="form_action">Remove Tag</button>
-              </h2>
-            </div>
+          </div>
         </div>
         <hr>
+
+        {% if group_upload_videos %}
+        <div class="row">
+          <div class="col-md-4">
+            <p><input type="checkbox" id="checkAll" > Select All Videos in This Group</p>
+          </div>
+        </div>
+        {% endif %}
+
         <div class="row">
           {% for video in group_upload_videos %}
-          <div class="col-md-3 portfolio-item">
-            <a href="#"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>            
+          <div class="col-md-3">
+            <a href="/watch_video/{{video.video_id}}" target="_blank"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>
             <h5><input type="checkbox" value="{{video.video_id}}" name="select_videos">
               &nbsp;&nbsp;&nbsp;<a href="#">{{video.title}}</a>
             </h5>

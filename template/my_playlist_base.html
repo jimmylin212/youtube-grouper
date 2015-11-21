@@ -24,9 +24,12 @@
     {% block share_menu %}{% endblock %}
     <div class="container" style="padding-top:70px;">
       <div class="raw">
-        <div class="col-md-2 col-md-offset-10">
+        <div class="col-md-4 col-md-offset-6" style="float:right;">
           <form method="post" action="">{% csrf_token %}
-            <button class="btn btn-default" type="submit" value="RemoveWatched" name="form_action" style="float:right;">Remove Watched</button>
+            <div style="float:right;">
+              <button class="btn btn-default" type="submit" value="RemoveWatched" name="form_action" disabled="disabled">Remove Watched</button>
+              <button class="btn btn-default" type="submit" value="RemoveAll" name="form_action">Remove All</button>
+            </div>
           </form>
         </div>
       </div>
