@@ -39,9 +39,9 @@
         <div class="row">
           {% for video in group_upload_videos %}
           <div class="col-md-3">
-            <a href="/watch_video/{{video.video_id}}" target="_blank"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>
+            <a href="#"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>
             <h5><input type="checkbox" value="{{video.video_id}}" name="select_videos">
-              &nbsp;&nbsp;&nbsp;<a href="#">{{video.title}}</a>
+              &nbsp;&nbsp;&nbsp;<a href="/watch_video/{{video.video_id}}" target="_blank">{{video.title}}</a>
             </h5>
             <p>Uploaded on {{video.upload_date}}</p>
           </div>

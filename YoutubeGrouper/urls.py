@@ -5,7 +5,7 @@ urlpatterns = patterns('',
     url(r'^my_subscriptions/$', 'mainsite.views.my_subscriptions'),
     url(r'^my_group/(\w+)$', 'mainsite.views.my_group'),
     url(r'^my_playlist/$', 'mainsite.views.my_playlist'),
-    url(r'^watch_video/$', 'mainsite.views.watch_video'),
+    url(r'^watch_video/([\w\d\-]+)/$', 'mainsite.views.watch_video'),
     url(r'^authentication/$', 'mainsite.views.authentication'),
     ## Cronjob start
     url(r'^get_daily_uploaded_video/$', 'mainsite.views.get_daily_uploaded_video'),

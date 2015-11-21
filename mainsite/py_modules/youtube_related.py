@@ -142,7 +142,7 @@ class Youtube:
 
 		## Create new playlist
 		default_playlist_title = 'YouGroupe'
-		default_playlist_description = 'Playlist for YouGroupe'
+		default_playlist_description = 'Playlist for YouGroupe, http://youtube-grouper.appspot.com/'
 
 		query_para = {'part' : 'snippet,status'}
 		query_para = self.query_dict_2_para(query_para)
