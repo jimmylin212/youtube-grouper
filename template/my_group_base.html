@@ -3,8 +3,8 @@
     {% block share_head %}{% endblock %}
     <script>
       $(document).ready(function(){
-        $('#checkAll').click(function () {    
-          $('input:checkbox').prop('checked', this.checked);    
+        $('#checkAll').click(function () {
+          $('input:checkbox').prop('checked', this.checked);
         });
       });
     </script>
@@ -22,7 +22,7 @@
           <div class="col-lg-4 col-lg-offset-8">
             <div style="float:right;">
               <button class="btn btn-success" type="submit" value="AddPlayList" name="form_action">Add to playlist</button>
-              <button class="btn btn-danger" type="submit" value="RemoveTag" name="form_action" disabled="disabled">Remove Tag</button>
+              <button class="btn btn-danger" type="submit" value="RemoveTag" name="form_action">Remove Tag</button>
             </div>
           </div>
         </div>
