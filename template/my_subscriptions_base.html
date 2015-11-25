@@ -26,7 +26,7 @@
     <form method="post" action="">{% csrf_token %}
   	  <div class="container" style="padding-top:70px;">
         <div class="raw">
-          <button class="btn btn-default" data-toggle="modal" data-target="#add_tags">Add Tags</button>         
+          <button class="btn btn-default" data-toggle="modal" data-target="#add_tags" type="button">Add Tags</button>         
         </div>
       </div>
       <!-- modal start -->
@@ -35,7 +35,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="myModalLabel">Enter Tags</h4>
+              <h4 class="modal-title" id="myModalLabel">Enter Tags<small>     (enter at least one tag)</small></h4>
             </div>
             <div class="modal-body">
               <ul class="list-inline" id="tagitinput"></ul>
@@ -78,9 +78,14 @@
           </div>
           <div class="row">
             <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'> 
-              {% for channel in no_groups|dictsort:"title" %}                
-                <option data-img-label="{{channel.title|truncatechars:"10"}}"
-                  data-img-src="{{channel.thumbnail}}" value="{{channel.channel_id}}"></option>
+              {% for channel in no_groups|dictsort:"title" %}
+                {% if channel.thumbnail == "https://s.ytimg.com/yts/img/avatar_720-vflYJnzBZ.png" %}
+                  <option data-img-label="{{channel.title|truncatechars:"10"}}"
+                    data-img-src="/static/images/no_thumbnail.png" value="{{channel.channel_id}}"></option>
+                {% else %}
+                  <option data-img-label="{{channel.title|truncatechars:"10"}}"
+                    data-img-src="{{channel.thumbnail}}" value="{{channel.channel_id}}"></option>
+                {% endif %}
               {% endfor %}
             </select>
           </div>
