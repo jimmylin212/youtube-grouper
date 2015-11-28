@@ -36,17 +36,33 @@
         </div>
         {% endif %}
 
-        <div class="row">
-          {% for video in group_upload_videos %}
-          <div class="col-md-3">
-            <a href="#"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>
-            <h5><input type="checkbox" value="{{video.video_id}}" name="select_videos">
-              &nbsp;&nbsp;&nbsp;<a href="/watch_video/{{video.video_id}}" target="_blank">{{video.title}}</a>
-            </h5>
-            <p>Uploaded on {{video.upload_date}}</p>
+        {% for videos in group_upload_videos %}
+          <div class="row" style="padding-top:5px;">
+            {% for video in videos %}
+            <div class="col-md-3">
+              <a href="#"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>
+              <h5><input type="checkbox" value="{{video.video_id}}" name="select_videos">
+                &nbsp;&nbsp;&nbsp;<a href="/watch_video/{{video.video_id}}" target="_blank">{{video.title}}</a>
+              </h5>
+              <p>Uploaded on {{video.upload_date}}</p>
+            </div>
+            {% endfor %}
           </div>
-          {% endfor %}
-        </div>
+        {% endfor %}
+
+        <hr>
+        {% for videos in group_watched_videos %}
+          <div class="row" style="padding-top:5px;">
+            {% for video in videos %}
+            <div class="col-md-3">
+              <a href="#"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>
+              <h5>&nbsp;&nbsp;&nbsp;<a href="/watch_video/{{video.video_id}}" target="_blank">{{video.title}}</a></h5>
+              <p>Uploaded on {{video.upload_date}}</p>
+            </div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+
         <!-- /.row -->
       </div>
     </form>

@@ -12,7 +12,7 @@ from mainsite.py_modules.cronjob import CronJob
 
 def login(request):
 	passed_dict = {}
-	return render_to_response('login.html', passed_dict) 
+	return render_to_response('login.html', passed_dict)
 
 def home(request):
 	return redirect('/my_subscriptions')
@@ -36,7 +36,7 @@ def my_subscriptions(request):
 	youtube = Youtube()
 	user_related = UserRelated()
 	subscription_related = Subscription()
-	
+
 	email = request.session.get('email')
 	if email == None:
 		return redirect('/login')
@@ -76,9 +76,10 @@ def my_group(request, group_name):
 		group.remove_group(email, group_name)
 		return redirect('/my_subscriptions/')
 
-	group_upload_videos = group.get_upload_viedos(email, group_name)
+	upload_videos, watched_videos = group.get_upload_viedos(email, group_name)
 
-	passed_dict['group_upload_videos'] = group_upload_videos
+	passed_dict['group_upload_videos'] = upload_videos
+	passed_dict['group_watched_videos'] = watched_videos
 	passed_dict['group_name'] = group_name
 	return render_to_response('my_group.html', passed_dict)
 
@@ -86,7 +87,7 @@ def my_playlist(request):
 	passed_dict = {}
 	passed_dict.update(csrf(request))
 	youtube = Youtube()
-	playlist = PlayList()	
+	playlist = PlayList()
 
 	email = request.session.get('email')
 	if email == None:
@@ -121,14 +122,14 @@ def get_daily_uploaded_video(request):
 def daily_check_video_status(request):
 	cronjob = CronJob()
 	cronjob.daily_check_video_status()
-	return render_to_response('dummy_cronjob_page.html')	
+	return render_to_response('dummy_cronjob_page.html')
 
 def daily_check_channel_status(request):
 	cronjob = CronJob()
 	cronjob.daily_check_channel_status()
-	return render_to_response('dummy_cronjob_page.html')	
+	return render_to_response('dummy_cronjob_page.html')
 
 def perge_old_videos(request):
 	cronjob = CronJob()
 	cronjob.perge_old_videos()
-	return render_to_response('dummy_cronjob_page.html')	
+	return render_to_response('dummy_cronjob_page.html')

@@ -15,18 +15,24 @@
       $(document).ready(function() {
         $("select").imagepicker({show_label:true});
         $('#tagitinput').tagit({
-           singleField:true 
+           singleField:true
         });
       });
+      {% if not channel_groups %}
+        $(window).load(function(){
+          $('#myModal').modal('show');
+        });
+      {% endif %}
     </script>
     <style type="text/css"> .topbuffer { margin-top:20px; } </style>
   </head>
+
   <body>
     {% block share_menu %}{% endblock %}
     <form method="post" action="">{% csrf_token %}
   	  <div class="container" style="padding-top:70px;">
         <div class="raw">
-          <button class="btn btn-default" data-toggle="modal" data-target="#add_tags" type="button">Add Tags</button>         
+          <button class="btn btn-default" data-toggle="modal" data-target="#add_tags" type="button">Add Tags</button>
         </div>
       </div>
       <!-- modal start -->
@@ -48,7 +54,7 @@
         </div>
       </div>
       <!-- modal end -->
-      
+
       {% if channel_groups %}
         <div class="container">
           {% for group_name, channels in channel_groups.items %}
@@ -58,12 +64,15 @@
               </div>
             </div>
             <div class="row">
-              <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'> 
+              <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'>
                 {% for channel in channels|dictsort:"title" %}
-                  <div class="col-md-1 portfolio-item">
-                   <option data-img-label="{{channel.title|truncatechars:"10"}}"
-                    data-img-src="{{channel.thumbnail}}" value="{{channel.channel_id}}"></option>
-                  </div>
+                  {% if channel.thumbnail == "https://s.ytimg.com/yts/img/avatar_720-vflYJnzBZ.png" %}
+                    <option data-img-label="{{channel.title|truncatechars:"10"}}"
+                      data-img-src="/static/images/no_thumbnail.png" value="{{channel.channel_id}}"></option>
+                  {% else %}
+                    <option data-img-label="{{channel.title|truncatechars:"10"}}"
+                      data-img-src="{{channel.thumbnail}}" value="{{channel.channel_id}}"></option>
+                  {% endif %}
                 {% endfor %}
               </select>
             </div>
@@ -77,7 +86,7 @@
             <div class="col-lg-4"><h2>No Tag</h2></div>
           </div>
           <div class="row">
-            <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'> 
+            <select multiple="multiple" class="image-picker show-label show-html" name='select_subscriptions'>
               {% for channel in no_groups|dictsort:"title" %}
                 {% if channel.thumbnail == "https://s.ytimg.com/yts/img/avatar_720-vflYJnzBZ.png" %}
                   <option data-img-label="{{channel.title|truncatechars:"10"}}"
@@ -91,7 +100,17 @@
           </div>
         </div>
       {% endif %}
-      
     </form>
+
+    <div class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h4 class="modal-title">Guide</h4></div>
+          <div class="modal-body"><p>Select some channels and add tag</p></div>
+          <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
   </body>
 <html>

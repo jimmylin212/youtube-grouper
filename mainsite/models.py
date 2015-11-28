@@ -39,3 +39,7 @@ class Video(ndb.Model):
 	upload_date = ndb.DateProperty()
 	title = ndb.StringProperty()
 	thumbnail = ndb.StringProperty()
+
+class AddedVideo(ndb.Model):
+	video_id = ndb.StringProperty()
+	email = ndb.StringProperty()

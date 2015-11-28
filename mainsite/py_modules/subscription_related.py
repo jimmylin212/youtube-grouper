@@ -4,10 +4,12 @@ from youtube_related import Youtube
 
 class Subscription:
 	def upsert_channel(self, email, channels):
-		user_channels = []
+		query_channels = []
 
+		## Add the newly subscribe channel
 		for channel in channels:
 			channel_id = channel['channelid']
+			query_channels.append(channel_id)
 			## Store channel in UserChannel
 			search_user_channel_result = UserChannel.query(UserChannel.email == email, UserChannel.channel_id == channel_id).get()
 
@@ -21,6 +23,13 @@ class Subscription:
 				Channel(channel_id=channel_id, title=channel['title'], thumbnail=channel['thumbnail'],
 						groups=None, upload_playlist_id=None, latest_video_id=None).put()
 
+		## Remove the unsubscribe channel
+		db_channels = UserChannel.query(UserChannel.email == email).fetch()
+		for db_channel in db_channels:
+			channel_id = db_channel.channel_id
+			if channel_id not in query_channels:
+				search_user_channel_result = UserChannel.query(UserChannel.email == email, UserChannel.channel_id == channel_id).get()
+				search_user_channel_result.key.delete()
 
 	def get_channel_groups(self, email):
 		channel_groups = {}

@@ -1,4 +1,4 @@
-from ..models import UserPlayList
+from ..models import UserPlayList, AddedVideo
 from youtube_related import Youtube
 
 class PlayList:
@@ -8,8 +8,7 @@ class PlayList:
 		playlist_id = self.check_playlist_exisxtence(email)
 		for video_id in videos:
 			youtube_related.add_video_into_playlist(email, playlist_id, video_id)
-
-		return
+			AddedVideo(email=email, video_id=video_id).put()
 
 	def check_playlist_exisxtence(self, email):
 		youtube_related = Youtube()
