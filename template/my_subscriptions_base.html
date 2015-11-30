@@ -17,6 +17,9 @@
         $('#tagitinput').tagit({
            singleField:true
         });
+        {% if new_channel_count or removed_channel_count  %}
+          $('#update_modal').modal('show');
+        {% endif %}
       });
       {% if not channel_groups %}
         $(window).load(function(){
@@ -33,6 +36,7 @@
   	  <div class="container" style="padding-top:70px;">
         <div class="raw">
           <button class="btn btn-default" data-toggle="modal" data-target="#add_tags" type="button">Add Tags</button>
+          <button class="btn btn-info" type="submit" value="Update" name="form_action" style="float:right;">Update Subscribes</button>
         </div>
       </div>
       <!-- modal start -->
@@ -102,11 +106,21 @@
       {% endif %}
     </form>
 
-    <div class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal fade" tabindex="-1" role="dialog" id="guide_modal">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header"><h4 class="modal-title">Guide</h4></div>
           <div class="modal-body"><p>Select some channels and add tag</p></div>
+          <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="update_modal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header"><h4 class="modal-title">Update Result</h4></div>
+          <div class="modal-body"><p>Add {{new_channel_count}} channels, remove {{removed_channel_count}} channels.</p></div>
           <div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->

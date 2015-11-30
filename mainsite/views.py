@@ -45,13 +45,14 @@ def my_subscriptions(request):
 		select_subscriptions = request.POST.getlist('select_subscriptions')
 		group_names = request.POST.get('tags')
 		subscription_related.add_group(email, select_subscriptions, group_names)
-
-	all_channels = youtube.get_subscriptions(email)
-
-	## Check the subscription status every time when user back to the page.
-	subscription_related.upsert_channel(email, all_channels)
+	elif request.method == "POST" and request.POST.get('form_action') == 'Update':
+		all_channels = youtube.get_subscriptions(email)
+		new_channel_count, removed_channel_count = subscription_related.upsert_channel(email, all_channels)
+		passed_dict['new_channel_count'] = new_channel_count
+		passed_dict['removed_channel_count'] = removed_channel_count
 
 	channel_groups, no_groups = subscription_related.get_channel_groups(email)
+
 	passed_dict['email'] = email
 	passed_dict['channel_groups'] = channel_groups
 	passed_dict['no_groups'] = no_groups
