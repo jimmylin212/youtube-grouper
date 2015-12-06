@@ -1,4 +1,4 @@
-import urllib2, datetime, re
+import urllib2, datetime, re, logging
 import xml.etree.ElementTree as etree
 from ..models import Channel, Video
 from youtube_related import Youtube
@@ -22,6 +22,7 @@ class CronJob:
 
 		for channel in channels:
 			channel_id = channel.channel_id
+			logging.info('Parsing channel %s' % channel_id)
 			feed_url = '%s%s' % (CronJob.feed_url_prefix, channel.channel_id)
 			try:
 				page = urllib2.urlopen(feed_url)
@@ -37,12 +38,15 @@ class CronJob:
 				upload_date = upload_date_ptn.findall(entry)[0].split('T')[0]
 
 				if video_id != None and title != None and upload_date != None and upload_date == day_before:
-					
+
 					upload_date = datetime.datetime.strptime(upload_date, '%Y-%m-%d')
 					## Store new uploaded video
-					store_doc = Video(channel_id=channel_id, title=title, video_id=video_id, 
+					store_doc = Video(channel_id=channel_id, title=title, video_id=video_id,
 									  upload_date=upload_date, thumbnail=thumbnail)
 					store_doc.put()
+					logging.info('[Success] Store video %s into db' % video_id)
+				else:
+					logging.info('[Failed] Store video %s into db' % video_id)
 
 	def daily_check_video_status(self):
 		youtube_related = Youtube()
@@ -52,12 +56,11 @@ class CronJob:
 			response = youtube_related.query_video(CronJob.query_email, video_detail.video_id)
 			if response['pageInfo']['totalResults'] == 0:
 				video_detail.key.delete()
+				logging.info('Remove %s from db' % video_detail.video_id)
 
 	def daily_check_channel_status(self):
 		youtube_related = Youtube()
-		return	
+		return
 
 	def perge_old_videos(self):
 		return
-
-

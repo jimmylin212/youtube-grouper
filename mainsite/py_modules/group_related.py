@@ -1,3 +1,4 @@
+import logging
 from ..models import UserChannel, Video, AddedVideo
 from youtube_related import Youtube
 
@@ -51,3 +52,5 @@ class Group:
 					user_channel_detail.group_name = None
 
 				user_channel_detail.put()
+				
+		logging.info('%s remove group %s' % (email, group_name))

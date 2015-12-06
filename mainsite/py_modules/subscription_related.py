@@ -1,4 +1,4 @@
-import datetime, urllib2, re
+import datetime, urllib2, re, logging
 from ..models import UserChannel, Channel, Video
 from youtube_related import Youtube
 
@@ -8,6 +8,7 @@ class Subscription:
 		removed_channel_count = 0
 		query_channels = []
 
+		logging.info('[Action] %s upsert channel and add %s, remove %s channels' % (email, new_channel_count, removed_channel_count))
 		## Add the newly subscribe channel
 		for channel in channels:
 			channel_id = channel['channelid']
@@ -35,6 +36,7 @@ class Subscription:
 				search_user_channel_result.key.delete()
 				removed_channel_count = removed_channel_count + 1
 
+		logging.info('[Success] %s upsert channel and add %s, remove %s channels' % (email, new_channel_count, removed_channel_count))
 		return new_channel_count, removed_channel_count
 
 	def get_channel_groups(self, email):
@@ -68,6 +70,7 @@ class Subscription:
 	def add_group(self, email, select_channel_ids, group_names):
 		youtube_related = Youtube()
 
+		logging.info('[Action] %s add %s channels into %s' % (email, len(select_channel_ids), group_names))
 		for select_channel_id in select_channel_ids:
 			for group_name in group_names.split(','):
 				## Add the group name into UserChannel collection
@@ -100,6 +103,8 @@ class Subscription:
 					search_channel_result.groups.append(group_name)
 					search_channel_result.upload_playlist_id = upload_playlist_id
 					search_channel_result.put()
+
+		logging.info('[Success] %s add %s channels into %s' % (email, len(select_channel_ids), group_names))
 
 	def parse_latest_videos(self, channel_id):
 		add_videos = []

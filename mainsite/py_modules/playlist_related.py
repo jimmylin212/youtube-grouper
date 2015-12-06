@@ -1,3 +1,4 @@
+import logging
 from ..models import UserPlayList, AddedVideo
 from youtube_related import Youtube
 
@@ -9,6 +10,7 @@ class PlayList:
 		for video_id in videos:
 			youtube_related.add_video_into_playlist(email, playlist_id, video_id)
 			AddedVideo(email=email, video_id=video_id).put()
+			logging.info('%s add video %s into playlist' % (email, video_id))
 
 	def check_playlist_exisxtence(self, email):
 		youtube_related = Youtube()
@@ -25,6 +27,7 @@ class PlayList:
 		if db_playlist_result == None:
 			playlist_id = youtube_related.add_new_playlist(email)
 			UserPlayList(email=email, playlist_id=playlist_id, watchhistory_playlist_id=watch_history_playlist_id).put()
+			logging.info('%s add new playlist' % email)
 		else:
 			playlist_id = db_playlist_result.playlist_id
 
