@@ -34,7 +34,7 @@ class Group:
 		upload_videos = [upload_videos[x:x+4] for x in xrange(0, len(upload_videos), 4)]
 
 		watched_videos = sorted(watched_videos, key=lambda k: k['upload_date'], reverse=True)
-		watched_videos = [watched_videos[x:x+4] for x in xrange(0, len(watched_videos), 4)]
+		watched_videos = [watched_videos[x:x+12] for x in xrange(0, len(watched_videos), 12)]
 		return upload_videos, watched_videos
 
 	def remove_group(self, email, group_name):
@@ -52,5 +52,5 @@ class Group:
 					user_channel_detail.group_name = None
 
 				user_channel_detail.put()
-				
+
 		logging.info('%s remove group %s' % (email, group_name))

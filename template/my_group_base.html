@@ -54,7 +54,7 @@
         {% for videos in group_watched_videos %}
           <div class="row" style="padding-top:5px;">
             {% for video in videos %}
-            <div class="col-md-3">
+            <div class="col-md-1">
               <a href="#"><img class="img-responsive" src="{{video.thumbnail}}" alt=""></a>
               <h5>&nbsp;&nbsp;&nbsp;<a href="/watch_video/{{video.video_id}}" target="_blank">{{video.title}}</a></h5>
               <p>Uploaded on {{video.upload_date}}</p>

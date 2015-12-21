@@ -6,4 +6,7 @@ cron:
 - description: daily check video status
   url: /daily_check_video_status/
   schedule: every day 00:10
-    
+
+- description: daily perge old videos
+  url: /perge_old_videos/
+  schedule: every day 00:30

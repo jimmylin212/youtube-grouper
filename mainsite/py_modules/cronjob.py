@@ -1,6 +1,6 @@
 import urllib2, datetime, re, logging
 import xml.etree.ElementTree as etree
-from ..models import Channel, Video
+from ..models import Channel, Video, AddedVideo
 from youtube_related import Youtube
 
 class CronJob:
@@ -46,13 +46,14 @@ class CronJob:
 					store_doc.put()
 					logging.info('[Success] Store video %s into db' % video_id)
 				else:
-					logging.info('[Failed] Store video %s into db' % video_id)
+					logging.info('[Failed] Store video %s into db, title = %s, upload_date = %s, day_before = %s' % (video_id, title, upload_date, day_before))
 
 	def daily_check_video_status(self):
 		youtube_related = Youtube()
 
 		video_details = Video.query().fetch()
 		for video_detail in video_details:
+			logging.info('Daily check video status query %s' % video_detail.video_id)
 			response = youtube_related.query_video(CronJob.query_email, video_detail.video_id)
 			if response['pageInfo']['totalResults'] == 0:
 				video_detail.key.delete()
@@ -63,4 +64,14 @@ class CronJob:
 		return
 
 	def perge_old_videos(self):
-		return
+		delete_video_count = 0
+		old_video_days = 14
+		old_video_date = datetime.date.today() - datetime.timedelta(days=old_video_days)
+		old_videos = Video.query(Video.upload_date < old_video_date).fetch()
+		for old_video in old_videos:
+			add_video = AddedVideo.query(AddedVideo.video_id == old_video.video_id).get()
+			if add_video == None:
+				old_video.key.delete()
+				delete_video_count = delete_video_count + 1
+
+		logging.info('Remove %s old videos' % delete_video_count)
