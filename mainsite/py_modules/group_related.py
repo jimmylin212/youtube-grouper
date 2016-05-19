@@ -5,7 +5,6 @@ from youtube_related import Youtube
 class Group:
 	def get_upload_viedos(self, email, group_name):
 		upload_videos = []
-		watched_videos = []
 		youtube = Youtube()
 
 		group_details = UserChannel.query(UserChannel.email == email).fetch()
@@ -24,18 +23,11 @@ class Group:
 										  	'upload_date' : channel_upload_video.upload_date,
 										  	'channel_id' : channel_upload_video.channel_id,
 										  	'thumbnail' : channel_upload_video.thumbnail})
-					else:
-						watched_videos.append({'title' : channel_upload_video.title, 'video_id' : channel_upload_video.video_id,
-										  	   'upload_date' : channel_upload_video.upload_date,
-										  	   'channel_id' : channel_upload_video.channel_id,
-										  	   'thumbnail' : channel_upload_video.thumbnail})
 
 		upload_videos = sorted(upload_videos, key=lambda k: k['upload_date'], reverse=True)
 		upload_videos = [upload_videos[x:x+4] for x in xrange(0, len(upload_videos), 4)]
 
-		watched_videos = sorted(watched_videos, key=lambda k: k['upload_date'], reverse=True)
-		watched_videos = [watched_videos[x:x+12] for x in xrange(0, len(watched_videos), 12)]
-		return upload_videos, watched_videos
+		return upload_videos
 
 	def remove_group(self, email, group_name):
 		group_details = UserChannel.query(UserChannel.email == email).fetch()

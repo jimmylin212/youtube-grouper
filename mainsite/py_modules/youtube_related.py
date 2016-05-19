@@ -1,4 +1,5 @@
 import urllib, urllib2, json, datetime, httplib, urlparse
+from google.appengine.api import urlfetch
 from user_related import UserRelated
 
 class Youtube:
@@ -10,6 +11,7 @@ class Youtube:
 	playlistitem_url = '%s/playlistItems?' % base_url
 
 	def api_querying(self, query_url, access_token, query_data=None):
+		urlfetch.set_default_fetch_deadline(20)
 		request = urllib2.Request(url=query_url, data=query_data)
 		if query_data != None:
 			request.add_header('Content-Type', 'application/json')
@@ -23,7 +25,7 @@ class Youtube:
 		headers = {'Authorization' : 'Bearer %s' % access_token}
 
 		connection = httplib.HTTPSConnection(query_domain)
-		connection.request(method, query_path, '', headers) 
+		connection.request(method, query_path, '', headers)
 		response = connection.getresponse()
 		return response.read()
 
@@ -162,7 +164,7 @@ class Youtube:
 
 		query_para = {'part' : 'snippet'}
 		query_para = self.query_dict_2_para(query_para)
-		query_data = {'snippet' : {'playlistId' : playlist_id, 
+		query_data = {'snippet' : {'playlistId' : playlist_id,
 								   'resourceId' : {'videoId' : video_id, 'kind' : 'youtube#video'}}}
 		query_data = json.dumps(query_data)
 		query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
@@ -176,7 +178,7 @@ class Youtube:
 		query_user_info = user_related.get_user_info(email=email)
 		access_token = query_user_info.access_token
 
-		yougroupe_playlist_videos = [] 
+		yougroupe_playlist_videos = []
 		query_para = {'part' : 'snippet', 'maxResults' : '50', 'playlistId' : playlist_id}
 		query_para = self.query_dict_2_para(query_para)
 		while True:
@@ -209,7 +211,7 @@ class Youtube:
 		query_user_info = user_related.get_user_info(email=email)
 		access_token = query_user_info.access_token
 
-		yougroupe_playlist_videos = [] 
+		yougroupe_playlist_videos = []
 		query_para = {'part' : 'snippet', 'maxResults' : '50', 'playlistId' : playlist_id}
 		query_para = self.query_dict_2_para(query_para)
 		while True:
@@ -225,8 +227,8 @@ class Youtube:
 		for video_detail in yougroupe_playlist_videos:
 			playlist_item_id = video_detail['id']
 			video_id = video_detail['snippet']['resourceId']['videoId']
-			
-			## Query to see if the video in watch history		
+
+			## Query to see if the video in watch history
 			query_para = {'part' : 'contentDetails', 'videoId' : video_id, 'playlistId' : watch_history_playlist_id}
 			query_para = self.query_dict_2_para(query_para)
 			query_url = "%s%s" % (Youtube.playlistitem_url, query_para)

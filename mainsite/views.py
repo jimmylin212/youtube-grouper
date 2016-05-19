@@ -77,10 +77,9 @@ def my_group(request, group_name):
 		group.remove_group(email, group_name)
 		return redirect('/my_subscriptions/')
 
-	upload_videos, watched_videos = group.get_upload_viedos(email, group_name)
+	upload_videos = group.get_upload_viedos(email, group_name)
 
 	passed_dict['group_upload_videos'] = upload_videos
-	passed_dict['group_watched_videos'] = watched_videos
 	passed_dict['group_name'] = group_name
 	return render_to_response('my_group.html', passed_dict)
 
