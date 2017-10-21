@@ -1,5 +1,5 @@
 import logging
-from ..models import UserPlayList, AddedVideo
+from ..models import UserPlayList, AddedVideo, Video
 from youtube_related import Youtube
 
 class PlayList:
@@ -8,9 +8,15 @@ class PlayList:
 		## Check if the playlist exists or not
 		playlist_id = self.check_playlist_exisxtence(email)
 		for video_id in videos:
-			youtube_related.add_video_into_playlist(email, playlist_id, video_id)
-			AddedVideo(email=email, video_id=video_id).put()
-			logging.info('%s add video %s into playlist' % (email, video_id))
+			response = youtube_related.add_video_into_playlist(email, playlist_id, video_id)
+
+			if response:
+				AddedVideo(email=email, video_id=video_id).put()
+				logging.info('%s add video %s into playlist' % (email, video_id))
+			else:
+				failed_video = Video.query(Video.video_id == video_id).get()
+				failed_video.key.delete()
+				logging.info('[Error] Adding video %s failed' % video_id)
 
 	def check_playlist_exisxtence(self, email):
 		youtube_related = Youtube()

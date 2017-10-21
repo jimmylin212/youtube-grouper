@@ -168,9 +168,12 @@ class Youtube:
 								   'resourceId' : {'videoId' : video_id, 'kind' : 'youtube#video'}}}
 		query_data = json.dumps(query_data)
 		query_url = "%s%s" % (Youtube.playlistitem_url, query_para)
-		response = self.api_querying(query_url=query_url, access_token=access_token, query_data=query_data)
-
-		return response
+		try:
+			response = self.api_querying(query_url=query_url, access_token=access_token, query_data=query_data)
+			return response
+		except:
+			return None
+		
 
 	def remove_all_from_playlist(self, email, playlist_id):
 		## Get access token from userinfo
